@@ -1,3 +1,20 @@
+<?php
+
+session_start();
+
+if (!isset($_SESSION['usuario'])) {
+    echo '
+    <script>
+        alert("Debe iniciar session");
+        window.location = "index.html";
+    </script>
+    ';
+    session_destroy();
+    die();
+}
+
+?>
+
 <!doctype html>
 <html lang="es" data-bs-theme="light">
 <head>
@@ -19,14 +36,13 @@
 
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
             <li><a href="index.html" class="nav-link px-2 link-secondary">Inicio</a></li>
-            <li><a href="juegos.html" class="nav-link px-2">Juegos</a></li>
+            <li><a href="juegos.php" class="nav-link px-2">Juegos</a></li>
             <li><a href="faqs.html" class="nav-link px-2">FAQs</a></li>
             <li><a href="nosotros.html" class="nav-link px-2">Nosotros</a></li>
         </ul>
 
         <div class="col-md-3 text-end">
-            <a href="signin.html" class="btn btn-outline-primary me-2">Iniciar Sesión</a>
-            <a href="signup.html" class="btn btn-primary">Registrarme</a>
+            <a href="php/CerrarSesion.php" class="btn btn-outline-primary me-2">Cerrar Sesión</a>
         </div>
     </header>
 </div>
@@ -75,7 +91,7 @@
     <footer class="py-3 my-4">
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="index.html" class="nav-link px-2 text-body-secondary">Inicio</a></li>
-            <li class="nav-item"><a href="juegos.html" class="nav-link px-2 text-body-secondary">Juegos</a></li>
+            <li class="nav-item"><a href="juegos.php" class="nav-link px-2 text-body-secondary">Juegos</a></li>
             <li class="nav-item"><a href="faqs.html" class="nav-link px-2 text-body-secondary">FAQs</a></li>
             <li class="nav-item"><a href="nosotros.html" class="nav-link px-2 text-body-secondary">Nosotros</a></li>
         </ul>
