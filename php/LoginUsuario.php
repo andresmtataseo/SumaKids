@@ -6,7 +6,7 @@ include 'conexion.php';
 
 $email = $_POST['email'];
 $password = $_POST['password'];
-$password = hash('sha256', $password);
+//$password = hash('sha256', $password);
 
 $query = "SELECT * FROM usuarios WHERE email='$email' AND password='$password'";
 

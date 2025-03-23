@@ -6,7 +6,7 @@ $nombre = $_POST['nombre'];
 $apellido = $_POST['apellido'];
 $email = $_POST['email'];
 $password = $_POST['password'];
-$password = hash('sha256', $password);
+//$password = hash('sha256', $password);
 
 $query = "INSERT INTO usuarios (nombre, apellido, email, password)  VALUES ('$nombre', '$apellido', '$email', '$password')";
 $queryVerificar = "SELECT * FROM usuarios WHERE email='$email'";
