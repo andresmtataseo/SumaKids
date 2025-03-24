@@ -51,22 +51,24 @@ if (!isset($_SESSION['usuario'])) {
     <div class="row"> <!-- Fila para las cards -->
         <!-- Card 2 -->
         <div class="col-md-6 mb-4"> <!-- Cada card ocupa 6 columnas en pantallas medianas y grandes -->
-            <div class="card h-100"> <!-- Asegura que todas las cards tengan la misma altura -->
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="assets/logo%20con%20fondo.png" class="img-fluid rounded-start" alt="...">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title">Ejercicios de Sumas</h5>
-                            <p class="card-text">Practica sumas simples con números de tres cifras y dos filas.
-                                Ejercicios diseñados para niños que están aprendiendo a sumar.</p>
-                            <p class="card-text"><small class="text-body-secondary">Última actualización hace 3
-                                    minutos</small></p>
+            <a href="ejercicios_sumas.php" style="text-decoration: none"> <!-- Enlace a la página de ejercicios de sumas -->
+                <div class="card h-100"> <!-- Asegura que todas las cards tengan la misma altura -->
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="assets/logo%20con%20fondo.png" class="img-fluid rounded-start" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">Ejercicios de Sumas</h5>
+                                <p class="card-text">Practica sumas simples con números de tres cifras y dos filas.
+                                    Ejercicios diseñados para niños que están aprendiendo a sumar.</p>
+                                <p class="card-text"><small class="text-body-secondary">Última actualización hace 3
+                                        minutos</small></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 1 -->
