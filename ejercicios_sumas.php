@@ -208,10 +208,10 @@ for ($i = 0; $i < 8; $i++) {
             let card = document.getElementById(`exerciseCard${index}`);
             card.style.backgroundColor = '#f8d7da';
 
-            primeraPosicion.textContent = 'ㅤ';
-            segundaPosicion.textContent = '';
-            terceraPosicion.textContent = '';
-            cuartaPosicion.textContent = '';
+            primeraPosicion.textContent = primera;
+            segundaPosicion.textContent = segunda;
+            terceraPosicion.textContent = tercera;
+            cuartaPosicion.textContent = cuarta;
 
             let modal = document.getElementById(`modalEjercicio${index}`);
             let modalInstance = bootstrap.Modal.getInstance(modal);
