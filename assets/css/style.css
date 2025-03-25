@@ -133,3 +133,9 @@ hr {
     margin: auto !important;
     opacity: 1 !important;
 }
+
+/* Deshabilitar la tarjeta visualmente */
+.disabled {
+    pointer-events: none; /* Desactiva la interacción con la tarjeta */
+    background-color: #6fff90 !important;
+}

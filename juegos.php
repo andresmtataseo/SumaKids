@@ -30,7 +30,7 @@ if (!isset($_SESSION['usuario'])) {
 <div class="container">
     <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <div class="col-md-3 mb-2 mb-md-0">
-            <a href="index.html" class="d-inline-flex link-body-emphasis text-decoration-none">
+            <a class="d-inline-flex link-body-emphasis text-decoration-none">
                 <img class="bi" role="img" aria-label="Bootstrap" src="assets/logo.png"/>
             </a>
         </div>
@@ -41,7 +41,7 @@ if (!isset($_SESSION['usuario'])) {
         </div>
 
         <div class="col-md-3 text-end">
-            <a href="php/CerrarSesion.php" class="btn btn-outline-primary me-2">Cerrar Sesión</a>
+            <a href="javascript:void(0);" class="btn btn-outline-primary me-2" onclick="mostrarModal()">Cerrar Sesión</a>
         </div>
     </header>
 </div>
@@ -131,6 +131,25 @@ if (!isset($_SESSION['usuario'])) {
     </div>
 </main>
 
+<!-- Modal de confirmación de cierre de sesión -->
+<div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-labelledby="modalCerrarSesionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCerrarSesionLabel">Confirmación de Cierre de Sesión</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que quieres cerrar sesión?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="php/CerrarSesion.php" class="btn btn-primary">Cerrar Sesión</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <footer class="py-3 my-4">
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
@@ -138,6 +157,14 @@ if (!isset($_SESSION['usuario'])) {
         <p class="text-center text-body-secondary">© 2025 SumaKids, Inc</p>
     </footer>
 </div>
+
+<script>
+    function mostrarModal() {
+        // Mostrar el modal de Bootstrap
+        var modal = new bootstrap.Modal(document.getElementById('modalCerrarSesion'));
+        modal.show();
+    }
+</script>
 
 <script src="https://kit.fontawesome.com/fb92c26a74.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

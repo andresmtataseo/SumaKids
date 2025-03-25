@@ -39,7 +39,7 @@ for ($i = 0; $i < 8; $i++) {
 <div class="container">
     <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <div class="col-md-3 mb-2 mb-md-0">
-            <a href="index.html" class="d-inline-flex link-body-emphasis text-decoration-none">
+            <a class="d-inline-flex link-body-emphasis text-decoration-none">
                 <img class="bi" role="img" aria-label="Bootstrap" src="assets/logo.png"/>
             </a>
         </div>
@@ -50,14 +50,22 @@ for ($i = 0; $i < 8; $i++) {
         </div>
 
         <div class="col-md-3 text-end">
-            <a href="php/CerrarSesion.php" class="btn btn-outline-primary me-2">Cerrar Sesión</a>
+            <a href="javascript:void(0);" class="btn btn-outline-primary me-2" onclick="mostrarModal()">Cerrar Sesión</a>
         </div>
     </header>
 </div>
 
 <div class="container">
 
-    <h2 class="text-center mb-4">Ejercicios de Sumas</h2>
+    <div class="row mb-4">
+        <div class="col-md-3 text-center">
+            <a href="juegos.php" class="btn btn-primary me-2">ㅤVolverㅤ</a>
+        </div>
+        <h2 class="col-md-6 text-center">Ejercicios de Sumas</h2>
+        <div class="col-md-3 text-center">
+            Barra de progreso
+        </div>
+    </div>
 
     <div class="row">
         <?php foreach ($ejercicios as $index => $ejercicio): ?>
@@ -108,7 +116,31 @@ for ($i = 0; $i < 8; $i++) {
     </div>
 </div>
 
+<!-- Modal de confirmación de cierre de sesión -->
+<div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-labelledby="modalCerrarSesionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCerrarSesionLabel">Confirmación de Cierre de Sesión</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que quieres cerrar sesión?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="php/CerrarSesion.php" class="btn btn-primary">Cerrar Sesión</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function mostrarModal() {
+        // Mostrar el modal de Bootstrap
+        var modal = new bootstrap.Modal(document.getElementById('modalCerrarSesion'));
+        modal.show();
+    }
     // Función para incrementar el valor de cada posición
     document.querySelectorAll('.digit').forEach(digit => {
         digit.addEventListener('click', function () {
@@ -147,7 +179,7 @@ for ($i = 0; $i < 8; $i++) {
             cuartaPosicion.textContent = cuarta;
 
             let card = document.getElementById(`exerciseCard${index}`);
-            card.style.backgroundColor = '#d4edda';
+            card.classList.add('disabled');
 
             // Enviar los datos al servidor para guardar en la base de datos
             let numero1 = <?php echo $ejercicio[0]; ?>;
@@ -178,7 +210,7 @@ for ($i = 0; $i < 8; $i++) {
             }
         } else {
             let card = document.getElementById(`exerciseCard${index}`);
-            card.style.backgroundColor = '#f8d7da';
+            card.style.backgroundColor = '#ff626f';
 
             primeraPosicion.textContent = primera;
             segundaPosicion.textContent = segunda;
