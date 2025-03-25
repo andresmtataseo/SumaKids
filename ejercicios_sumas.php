@@ -32,66 +32,30 @@ for ($i = 0; $i < 8; $i++) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ejercicios de Sumas - SumaKids</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .exercise-card {
-            cursor: pointer;
-            text-align: center;
-            align-items: center;
-            font-size: 2rem;
-            font-weight: bold;
-            padding: 10px 20px 20px 8px !important;
-            border-radius: 10px;
-            background-color: #f8f9fa;
-        }
-
-        .sum-container {
-            display: inline-block;
-            text-align: right;
-            font-size: 3.5rem;
-            font-family: monospace;
-            line-height: 1.2;
-        }
-
-        .plus {
-            font-size: 3.5rem;
-            font-weight: bold;
-        }
-
-        .plus-modal {
-            font-size: 6.5rem;
-            font-weight: bold;
-        }
-
-        .plus-modal-result {
-            font-size: 6.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .plus-modal-result:hover {
-            border: 2px solid #007bff;
-            border-radius: 5px;
-        }
-
-        hr {
-            margin: auto !important;
-            opacity: 1 !important;
-        }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
 </head>
 <body>
 
 <div class="container">
-    <header class="d-flex flex-wrap align-items-center justify-content-between py-3 mb-4 border-bottom">
-        <div>
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+        <div class="col-md-3 mb-2 mb-md-0">
             <a href="index.html" class="d-inline-flex link-body-emphasis text-decoration-none">
-                <img src="assets/logo.png" alt="Logo">
+                <img class="bi" role="img" aria-label="Bootstrap" src="assets/logo.png"/>
             </a>
         </div>
-        <a href="php/CerrarSesion.php" class="btn btn-outline-primary">Cerrar Sesión</a>
+
+        <div class="col-md-6 text-center">
+            <p class="fw-bold" style="margin-bottom: 1px !important;"><?php echo $_SESSION['usuario']['nombre'] . " " . $_SESSION['usuario']['apellido']; ?></p>
+            <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1px !important;"><?php echo $_SESSION['usuario']['email']; ?></p>
+        </div>
+
+        <div class="col-md-3 text-end">
+            <a href="php/CerrarSesion.php" class="btn btn-outline-primary me-2">Cerrar Sesión</a>
+        </div>
     </header>
+</div>
+
+<div class="container">
 
     <h2 class="text-center mb-4">Ejercicios de Sumas</h2>
 
@@ -149,7 +113,12 @@ for ($i = 0; $i < 8; $i++) {
     document.querySelectorAll('.digit').forEach(digit => {
         digit.addEventListener('click', function () {
             let valorActual = parseInt(this.textContent);
-            this.textContent = (valorActual + 1) % 10; // Incrementa hasta 9, luego vuelve a 0
+            if (valorActual != 0) {
+                this.textContent = 0;
+            }
+            this.textContent = (valorActual + 1) % 10;
+            const sonido = new Audio('assets/incrementar.mp3');
+            sonido.play();
         });
     });
 
@@ -198,6 +167,9 @@ for ($i = 0; $i < 8; $i++) {
                 .then(data => console.log(data))
                 .catch(error => console.error('Error al guardar:', error));
 
+            const sonido = new Audio('assets/bueno.mp3');
+            sonido.play();
+
             // Cerrar modal
             let modal = document.getElementById(`modalEjercicio${index}`);
             let modalInstance = bootstrap.Modal.getInstance(modal);
@@ -212,6 +184,9 @@ for ($i = 0; $i < 8; $i++) {
             segundaPosicion.textContent = segunda;
             terceraPosicion.textContent = tercera;
             cuartaPosicion.textContent = cuarta;
+
+            const sonido = new Audio('assets/malo.mp3');
+            sonido.play();
 
             let modal = document.getElementById(`modalEjercicio${index}`);
             let modalInstance = bootstrap.Modal.getInstance(modal);

@@ -9,13 +9,13 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <div class="container">
     <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <div class="col-md-3 mb-2 mb-md-0">
             <a href="index.html" class="d-inline-flex link-body-emphasis text-decoration-none">
-                <img class="bi" width="100" height="32" role="img" aria-label="Bootstrap" src="assets/logo.png"/>
+                <img class="bi" role="img" aria-label="Bootstrap" src="assets/logo.png"/>
             </a>
         </div>
 
@@ -33,13 +33,27 @@
     </header>
 </div>
 
-<div class="container">
-    <h1 class="mt-4 mb-3">Bienvenido a SumaKids</h1>
-</div>
+<!-- Contenedor principal con flex-grow-1 para ocupar el espacio restante -->
+<main class="flex-grow-1">
+    <div class="boxHeader">
+        <div class="textosHeader">
+            <h1><b>¡Bienvenido a SumaKids!</b></h1>
+            <p>Aquí, las matemáticas se convierten en una emocionante aventura.
+                Sumas, restas y mucho más te esperan para que aprendas jugando. ¡Prepárate para descubrir lo divertido
+                que puede ser resolver desafíos matemáticos y convertirte en un verdadero maestro de los números! </p>
+            <a class="btn btn-primary" href="signin.html"><b>¡Vamos a jugar y aprender juntos!</b></a>
+        </div>
 
+        <div class="imgHeader">
+            <video autoplay muted loop id="background-video">
+                <source src="assets/banner.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+</main>
 
-<div class="container">
-    <footer class="py-3 my-4">
+<footer class="mt-auto py-3 bg-body-tertiary">
+    <div class="container">
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="index.html" class="nav-link px-2 text-body-secondary">Inicio</a></li>
             <li class="nav-item"><a href="juegos.php" class="nav-link px-2 text-body-secondary">Juegos</a></li>
@@ -47,8 +61,8 @@
             <li class="nav-item"><a href="nosotros.html" class="nav-link px-2 text-body-secondary">Nosotros</a></li>
         </ul>
         <p class="text-center text-body-secondary">© 2025 SumaKids, Inc</p>
-    </footer>
-</div>
+    </div>
+</footer>
 
 <script src="https://kit.fontawesome.com/fb92c26a74.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

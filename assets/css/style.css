@@ -1,0 +1,135 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* viewport height */
+}
+
+footer {
+    margin-top: auto;
+}
+
+.hero {
+    height: 700px;
+    width: 100%;
+    position: relative;
+}
+
+.boxHeader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.boxHeader .textosHeader {
+    position: relative;
+    z-index: 1; /* Asegura que el texto esté sobre el video */
+    text-align: center;
+    transform: translateY(0);
+    opacity: 1;
+    animation: animacion2 1s ease-out;
+    width: 50%;
+}
+
+.boxHeader .textosHeader h1 {
+    font-size: 60px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.boxHeader .textosHeader p {
+    font-size: 20px;
+    text-shadow: 2px 2px 4px rgba(255, 255, 0, 0.3);
+}
+
+.boxHeader .imgHeader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.imgHeader video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Asegura que el video se vea completo sin recortarse */
+    background-color: #fff;
+    opacity: 0.75; /* Ajusta el valor entre 0 (totalmente transparente) y 1 (completamente visible) */
+    pointer-events: none;
+    user-select: none;
+}
+
+
+@keyframes animacion1 {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes animacion2 {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+
+.exercise-card {
+    cursor: pointer;
+    text-align: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 10px 20px 20px 8px !important;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+}
+
+.sum-container {
+    display: inline-block;
+    text-align: right;
+    font-size: 3.5rem;
+    font-family: monospace;
+    line-height: 1.2;
+}
+
+.plus {
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+
+.plus-modal {
+    font-size: 6.5rem;
+    font-weight: bold;
+}
+
+.plus-modal-result {
+    font-size: 6.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.plus-modal-result:hover {
+    border: 2px solid #007bff;
+    border-radius: 5px;
+}
+
+hr {
+    margin: auto !important;
+    opacity: 1 !important;
+}
