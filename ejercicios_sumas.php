@@ -11,7 +11,7 @@ if (!isset($_SESSION['usuario'])) {
     die();
 }
 
-// Conexión a la base de datos para recuperar ejercicios ya resueltos
+// Conexión a la base de datos para recuperar ejercicios ya resueltos y el nivel del usuario
 include 'php/conexion.php';
 
 $idUsuario = $_SESSION['usuario']['id'];
@@ -19,7 +19,7 @@ $ejerciciosBuenosDB = array();
 
 // Se asume que se agregó la columna "card_index" en la tabla "ejercicios"
 // (Ejemplo: ALTER TABLE ejercicios ADD card_index INT NULL;)
-$query = "SELECT * FROM ejercicios WHERE usuario_id = '$idUsuario' AND card_index IS NOT NULL";
+$query = "SELECT * FROM ejercicios WHERE usuario_id = '$idUsuario' AND card_index IS NOT NULL AND nivel = " . (isset($_SESSION['nivel']) ? $_SESSION['nivel'] : 1);
 $result = mysqli_query($conexion, $query);
 if ($result) {
     while($row = mysqli_fetch_assoc($result)) {
@@ -29,6 +29,15 @@ if ($result) {
 }
 mysqli_close($conexion);
 
+// Recuperar o inicializar el nivel del usuario
+if (!isset($_SESSION['nivel'])) {
+    // Aquí podrías consultar la tabla "niveles" para ver si el usuario ya tiene nivel
+    // Si no existe, se inicia en 1 y se inserta en la tabla (esto es un ejemplo)
+    $_SESSION['nivel'] = 1;
+    // Opcional: Insertar en la tabla niveles (si no existe registro para este usuario)
+    // Se recomienda tener un script aparte para manejar la lógica de niveles.
+}
+
 // Función para generar sumas aleatorias de tres cifras
 function generarSuma() {
     $num1 = rand(100, 999);
@@ -36,7 +45,7 @@ function generarSuma() {
     return [$num1, $num2];
 }
 
-// Si no existe ya el arreglo de ejercicios en la sesión, se crea
+// Si ya existe el arreglo de ejercicios en la sesión, se usa; de lo contrario se crea.
 if (!isset($_SESSION['ejercicios_suma'])) {
     $ejercicios = [];
     for ($i = 0; $i < 8; $i++) {
@@ -63,8 +72,25 @@ if (!isset($_SESSION['ejercicios_suma'])) {
     }
     $_SESSION['ejercicios_suma'] = $ejercicios;
 } else {
-    // Si ya existe, se reutiliza
     $ejercicios = $_SESSION['ejercicios_suma'];
+}
+
+// Verificar si todos los ejercicios fueron resueltos para subir de nivel
+$countSolucionados = 0;
+foreach ($ejercicios as $ej) {
+    if ($ej['solucionado']) {
+        $countSolucionados++;
+    }
+}
+if ($countSolucionados === 8) {
+    // Incrementar nivel en la sesión
+    $_SESSION['nivel']++;
+    // Aquí puedes actualizar/inserta en la tabla niveles para guardar el nuevo nivel del usuario.
+    // Reiniciamos el arreglo de ejercicios para el nuevo nivel:
+    unset($_SESSION['ejercicios_suma']);
+    // Redirigir para refrescar la página y que se genere el nuevo set de ejercicios:
+    header("Location: ejercicios_sumas.php");
+    exit();
 }
 ?>
 
@@ -104,9 +130,9 @@ if (!isset($_SESSION['ejercicios_suma'])) {
         <div class="col-md-3 text-center">
             <a href="juegos.php" class="btn btn-danger me-2">Salir</a>
         </div>
-        <h2 class="col-md-6 text-center">Nivel 1</h2>
+        <h2 class="col-md-6 text-center">Nivel <?php echo $_SESSION['nivel']; ?></h2>
         <div class="col-md-3 text-center">
-            <a  class="btn btn-warning me-2">Reiniciar Nivel</a>
+            <a class="btn btn-warning me-2" href="reiniciar_nivel.php">Reiniciar Nivel</a>
         </div>
     </div>
 
@@ -230,13 +256,14 @@ if (!isset($_SESSION['ejercicios_suma'])) {
             let card = document.getElementById(`exerciseCard${index}`);
             card.classList.add('disabled');
 
-            // Enviar los datos al servidor, incluyendo el índice de card
+            // Enviar los datos al servidor, incluyendo el índice de card y el nivel actual
             let formData = new FormData();
             formData.append('numero1', numero1);
             formData.append('numero2', numero2);
             formData.append('resultado_correcto', resultadoCorrecto);
             formData.append('resultado_usuario', respuestaUsuario);
             formData.append('card_index', index);
+            formData.append('nivel', <?php echo $_SESSION['nivel']; ?>);
 
             fetch('php/GuardarEjercicio.php', {
                 method: 'POST',

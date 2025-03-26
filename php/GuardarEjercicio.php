@@ -13,11 +13,12 @@ $numero2 = $_POST['numero2'];
 $resultadoCorrecto = $_POST['resultado_correcto'];
 $respuesta_usuario = $_POST['resultado_usuario'];
 $card_index = $_POST['card_index']; // Índice de la card
+$nivel = $_POST['nivel']; // Nivel actual del usuario
 
 if ($respuesta_usuario == $resultadoCorrecto) {
-    // Se inserta el ejercicio junto con la posición de la card
-    $query = "INSERT INTO ejercicios (usuario_id, numero1, numero2, resultado_correcto, respuesta_usuario, card_index) 
-              VALUES ('$idUsuario', '$numero1', '$numero2', '$resultadoCorrecto', '$respuesta_usuario', '$card_index')";
+    // Se inserta el ejercicio junto con la posición de la card y el nivel
+    $query = "INSERT INTO ejercicios (usuario_id, numero1, numero2, resultado_correcto, respuesta_usuario, card_index, nivel) 
+              VALUES ('$idUsuario', '$numero1', '$numero2', '$resultadoCorrecto', '$respuesta_usuario', '$card_index', '$nivel')";
     $execute = mysqli_query($conexion, $query);
 
     if ($execute) {
@@ -30,3 +31,4 @@ if ($respuesta_usuario == $resultadoCorrecto) {
 }
 
 mysqli_close($conexion);
+?>
