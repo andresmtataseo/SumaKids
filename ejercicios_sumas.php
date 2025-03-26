@@ -11,15 +11,33 @@ if (!isset($_SESSION['usuario'])) {
     die();
 }
 
-// Conexión a la base de datos para recuperar ejercicios ya resueltos y el nivel del usuario
+// Conexión a la base de datos para recuperar el último nivel del usuario
 include 'php/conexion.php';
 
 $idUsuario = $_SESSION['usuario']['id'];
+
+// Recuperar el último nivel del usuario desde la tabla niveles
+$queryNivel = "SELECT nivel FROM niveles WHERE usuario_id = '$idUsuario' ORDER BY fecha DESC LIMIT 1";
+$resultNivel = mysqli_query($conexion, $queryNivel);
+if ($resultNivel && mysqli_num_rows($resultNivel) > 0) {
+    $rowNivel = mysqli_fetch_assoc($resultNivel);
+    $_SESSION['nivel'] = $rowNivel['nivel'];
+} else {
+    // Si no existe registro, se asigna nivel 1 (podrías insertarlo si lo deseas)
+    $_SESSION['nivel'] = 1;
+}
+mysqli_close($conexion);
+
+// --------------------------------------------------------------------------------
+
+// Conexión a la base de datos para recuperar ejercicios ya resueltos del nivel actual
+include 'php/conexion.php';
+
 $ejerciciosBuenosDB = array();
 
 // Se asume que se agregó la columna "card_index" en la tabla "ejercicios"
 // (Ejemplo: ALTER TABLE ejercicios ADD card_index INT NULL;)
-$query = "SELECT * FROM ejercicios WHERE usuario_id = '$idUsuario' AND card_index IS NOT NULL AND nivel = " . (isset($_SESSION['nivel']) ? $_SESSION['nivel'] : 1);
+$query = "SELECT * FROM ejercicios WHERE usuario_id = '$idUsuario' AND card_index IS NOT NULL AND nivel = " . $_SESSION['nivel'];
 $result = mysqli_query($conexion, $query);
 if ($result) {
     while($row = mysqli_fetch_assoc($result)) {
@@ -28,15 +46,6 @@ if ($result) {
     }
 }
 mysqli_close($conexion);
-
-// Recuperar o inicializar el nivel del usuario
-if (!isset($_SESSION['nivel'])) {
-    // Aquí podrías consultar la tabla "niveles" para ver si el usuario ya tiene nivel
-    // Si no existe, se inicia en 1 y se inserta en la tabla (esto es un ejemplo)
-    $_SESSION['nivel'] = 1;
-    // Opcional: Insertar en la tabla niveles (si no existe registro para este usuario)
-    // Se recomienda tener un script aparte para manejar la lógica de niveles.
-}
 
 // Función para generar sumas aleatorias de tres cifras
 function generarSuma() {
@@ -75,7 +84,8 @@ if (!isset($_SESSION['ejercicios_suma'])) {
     $ejercicios = $_SESSION['ejercicios_suma'];
 }
 
-// Verificar si todos los ejercicios fueron resueltos para subir de nivel
+// Verificar si todos los ejercicios fueron resueltos para mostrar el modal de felicitaciones
+$nivelCompleto = false;
 $countSolucionados = 0;
 foreach ($ejercicios as $ej) {
     if ($ej['solucionado']) {
@@ -83,17 +93,9 @@ foreach ($ejercicios as $ej) {
     }
 }
 if ($countSolucionados === 8) {
-    // Incrementar nivel en la sesión
-    $_SESSION['nivel']++;
-    // Aquí puedes actualizar/inserta en la tabla niveles para guardar el nuevo nivel del usuario.
-    // Reiniciamos el arreglo de ejercicios para el nuevo nivel:
-    unset($_SESSION['ejercicios_suma']);
-    // Redirigir para refrescar la página y que se genere el nuevo set de ejercicios:
-    header("Location: ejercicios_sumas.php");
-    exit();
+    $nivelCompleto = true;
 }
 ?>
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -104,7 +106,6 @@ if ($countSolucionados === 8) {
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
 </head>
 <body>
-
 <div class="container">
     <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <div class="col-md-3 mb-2 mb-md-0">
@@ -112,20 +113,16 @@ if ($countSolucionados === 8) {
                 <img class="bi" role="img" aria-label="Bootstrap" src="assets/logo.png"/>
             </a>
         </div>
-
         <div class="col-md-6 text-center">
             <p class="fw-bold" style="margin-bottom: 1px !important;"><?php echo $_SESSION['usuario']['nombre'] . " " . $_SESSION['usuario']['apellido']; ?></p>
             <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1px !important;"><?php echo $_SESSION['usuario']['email']; ?></p>
         </div>
-
         <div class="col-md-3 text-end">
             <a href="javascript:void(0);" class="btn btn-outline-primary me-2" onclick="mostrarModal()">Cerrar Sesión</a>
         </div>
     </header>
 </div>
-
 <div class="container">
-
     <div class="row mb-4">
         <div class="col-md-3 text-center">
             <a href="juegos.php" class="btn btn-danger me-2">Salir</a>
@@ -135,7 +132,6 @@ if ($countSolucionados === 8) {
             <a class="btn btn-warning me-2" href="reiniciar_nivel.php">Reiniciar Nivel</a>
         </div>
     </div>
-
     <div class="row">
         <?php foreach ($ejercicios as $index => $ejercicio):
             $solucionado = $ejercicio['solucionado'];
@@ -148,7 +144,6 @@ if ($countSolucionados === 8) {
                         <hr>
                         <div style="display: flex; align-items: center; justify-content: end;">
                             <?php if($solucionado):
-                                // Se muestra el resultado formateado a 4 dígitos
                                 $solvedAnswer = str_pad($ejercicio['resultado'], 4, "0", STR_PAD_LEFT);
                                 ?>
                                 <div class="plus" id="cuartaPosicionListo<?php echo $index; ?>"><?php echo $solvedAnswer[0]; ?></div>
@@ -165,7 +160,6 @@ if ($countSolucionados === 8) {
                     </div>
                 </div>
             </div>
-
             <!-- Modal para resolver el ejercicio (solo si no está resuelto) -->
             <?php if(!$solucionado): ?>
             <div class="modal fade" id="modalEjercicio<?php echo $index; ?>" tabindex="-1" aria-hidden="true">
@@ -193,18 +187,37 @@ if ($countSolucionados === 8) {
                 </div>
             </div>
         <?php endif; ?>
-
         <?php endforeach; ?>
     </div>
 </div>
-
+<!-- Modal de felicitaciones por completar el nivel -->
+<div class="modal fade" id="modalNivelCompleto" tabindex="-1" aria-labelledby="modalNivelCompletoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNivelCompletoLabel">¡Felicidades!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Has completado todos los ejercicios del Nivel <?php echo $_SESSION['nivel']; ?>.</p>
+                <p>¿Qué deseas hacer?</p>
+            </div>
+            <div class="modal-footer">
+                <!-- Botón para avanzar al siguiente nivel: redirige a AvanzarNivel.php -->
+                <a href="php/AvanzarNivel.php" class="btn btn-success">Siguiente Nivel</a>
+                <!-- Botón para salir: redirige a la página de juegos -->
+                <a href="juegos.php" class="btn btn-danger">Salir</a>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Modal de confirmación de cierre de sesión -->
 <div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-labelledby="modalCerrarSesionLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalCerrarSesionLabel">Confirmación de Cierre de Sesión</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 ¿Estás seguro de que quieres cerrar sesión?
@@ -216,13 +229,11 @@ if ($countSolucionados === 8) {
         </div>
     </div>
 </div>
-
 <script>
     function mostrarModal() {
         var modal = new bootstrap.Modal(document.getElementById('modalCerrarSesion'));
         modal.show();
     }
-
     // Incrementar el valor de cada dígito (solo para ejercicios no resueltos)
     document.querySelectorAll('.digit').forEach(digit => {
         digit.addEventListener('click', function () {
@@ -233,29 +244,24 @@ if ($countSolucionados === 8) {
             sonido.play();
         });
     });
-
     function comprobarRespuesta(resultadoCorrecto, index, numero1, numero2) {
         let primera = document.getElementById(`primeraPosicion${index}`).textContent;
         let segunda = document.getElementById(`segundaPosicion${index}`).textContent;
         let tercera = document.getElementById(`terceraPosicion${index}`).textContent;
         let cuarta = document.getElementById(`cuartaPosicion${index}`).textContent;
         let respuestaUsuario = parseInt(cuarta + tercera + segunda + primera);
-
         // Mostrar en la card el resultado si es correcto
         let primeraPosicion = document.getElementById(`primeraPosicionListo${index}`);
         let segundaPosicion = document.getElementById(`segundaPosicionListo${index}`);
         let terceraPosicion = document.getElementById(`terceraPosicionListo${index}`);
         let cuartaPosicion = document.getElementById(`cuartaPosicionListo${index}`);
-
         if (respuestaUsuario === resultadoCorrecto) {
             primeraPosicion.textContent = primera;
             segundaPosicion.textContent = segunda;
             terceraPosicion.textContent = tercera;
             cuartaPosicion.textContent = cuarta;
-
             let card = document.getElementById(`exerciseCard${index}`);
             card.classList.add('disabled');
-
             // Enviar los datos al servidor, incluyendo el índice de card y el nivel actual
             let formData = new FormData();
             formData.append('numero1', numero1);
@@ -264,18 +270,15 @@ if ($countSolucionados === 8) {
             formData.append('resultado_usuario', respuestaUsuario);
             formData.append('card_index', index);
             formData.append('nivel', <?php echo $_SESSION['nivel']; ?>);
-
             fetch('php/GuardarEjercicio.php', {
                 method: 'POST',
                 body: formData
             }).then(response => response.text())
                 .then(data => console.log(data))
                 .catch(error => console.error('Error al guardar:', error));
-
             const sonido = new Audio('assets/bueno.mp3');
             sonido.play();
-
-            // Cerrar modal
+            // Cerrar modal de ejercicio
             let modal = document.getElementById(`modalEjercicio${index}`);
             let modalInstance = bootstrap.Modal.getInstance(modal);
             if (modalInstance) {
@@ -286,8 +289,13 @@ if ($countSolucionados === 8) {
             sonido.play();
         }
     }
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php if ($nivelCompleto) { ?>
+        var modalNivel = new bootstrap.Modal(document.getElementById('modalNivelCompleto'));
+        modalNivel.show();
+        <?php } ?>
+    });
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
