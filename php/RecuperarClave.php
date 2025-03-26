@@ -47,7 +47,7 @@ if ($row = mysqli_fetch_assoc($result)) {
         $mail->setFrom('recuperacion@grupo4pw.miuni.kids', 'Soporte');
         $mail->addAddress($email);
         $mail->Subject = 'Recuperacion de contrasena';
-        $mail->Body = "Hola, tu contraseña actual es:\n\n$password\n\nTe recomendamos cambiarla y guardarla en un lugar seguro.";
+        $mail->Body = "Hola, tu contraseña actual es:\n\n$password\n\nTe recomendamos guardarla en un lugar seguro.";
 
         $mail->send();
 

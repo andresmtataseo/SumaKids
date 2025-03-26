@@ -11,7 +11,7 @@ if (!isset($_SESSION['usuario'])) {
     die();
 }
 
-// Generar sumas aleatorias de tres cifras
+// Generar sumas aleatorias de tres cifras solo si no existen en la sesión
 function generarSuma()
 {
     $num1 = rand(100, 999);
@@ -19,10 +19,16 @@ function generarSuma()
     return [$num1, $num2];
 }
 
-$ejercicios = [];
-for ($i = 0; $i < 8; $i++) {
-    $ejercicios[] = generarSuma();
+// Verificar si ya existen ejercicios en la sesión
+if (!isset($_SESSION['ejercicios_suma'])) {
+    $ejercicios = [];
+    for ($i = 0; $i < 8; $i++) {
+        $ejercicios[] = generarSuma();
+    }
+    $_SESSION['ejercicios_suma'] = $ejercicios;
 }
+
+$ejercicios = $_SESSION['ejercicios_suma'];
 ?>
 
 <!doctype html>
@@ -209,22 +215,9 @@ for ($i = 0; $i < 8; $i++) {
                 modalInstance.hide();
             }
         } else {
-            let card = document.getElementById(`exerciseCard${index}`);
-            card.style.backgroundColor = '#ff626f';
-
-            primeraPosicion.textContent = primera;
-            segundaPosicion.textContent = segunda;
-            terceraPosicion.textContent = tercera;
-            cuartaPosicion.textContent = cuarta;
-
             const sonido = new Audio('assets/malo.mp3');
             sonido.play();
 
-            let modal = document.getElementById(`modalEjercicio${index}`);
-            let modalInstance = bootstrap.Modal.getInstance(modal);
-            if (modalInstance) {
-                modalInstance.hide();
-            }
         }
     }
 </script>
