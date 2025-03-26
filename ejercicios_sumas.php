@@ -11,24 +11,61 @@ if (!isset($_SESSION['usuario'])) {
     die();
 }
 
-// Generar sumas aleatorias de tres cifras solo si no existen en la sesión
-function generarSuma()
-{
+// Conexión a la base de datos para recuperar ejercicios ya resueltos
+include 'php/conexion.php';
+
+$idUsuario = $_SESSION['usuario']['id'];
+$ejerciciosBuenosDB = array();
+
+// Se asume que se agregó la columna "card_index" en la tabla "ejercicios"
+// (Ejemplo: ALTER TABLE ejercicios ADD card_index INT NULL;)
+$query = "SELECT * FROM ejercicios WHERE usuario_id = '$idUsuario' AND card_index IS NOT NULL";
+$result = mysqli_query($conexion, $query);
+if ($result) {
+    while($row = mysqli_fetch_assoc($result)) {
+        // Se guarda el ejercicio resuelto según la posición de la card
+        $ejerciciosBuenosDB[$row['card_index']] = $row;
+    }
+}
+mysqli_close($conexion);
+
+// Función para generar sumas aleatorias de tres cifras
+function generarSuma() {
     $num1 = rand(100, 999);
     $num2 = rand(100, 999);
     return [$num1, $num2];
 }
 
-// Verificar si ya existen ejercicios en la sesión
+// Si no existe ya el arreglo de ejercicios en la sesión, se crea
 if (!isset($_SESSION['ejercicios_suma'])) {
     $ejercicios = [];
     for ($i = 0; $i < 8; $i++) {
-        $ejercicios[] = generarSuma();
+        if (isset($ejerciciosBuenosDB[$i])) {
+            // Ejercicio ya resuelto (se recupera de la DB)
+            $ejercicio = [
+                'numero1'    => $ejerciciosBuenosDB[$i]['numero1'],
+                'numero2'    => $ejerciciosBuenosDB[$i]['numero2'],
+                'resultado'  => $ejerciciosBuenosDB[$i]['respuesta_usuario'], // resultado del ejercicio
+                'solucionado'=> true,
+                'card_index' => $i
+            ];
+        } else {
+            // Ejercicio no resuelto: se genera una sola vez y se guarda en la sesión
+            list($num1, $num2) = generarSuma();
+            $ejercicio = [
+                'numero1'    => $num1,
+                'numero2'    => $num2,
+                'solucionado'=> false,
+                'card_index' => $i
+            ];
+        }
+        $ejercicios[] = $ejercicio;
     }
     $_SESSION['ejercicios_suma'] = $ejercicios;
+} else {
+    // Si ya existe, se reutiliza
+    $ejercicios = $_SESSION['ejercicios_suma'];
 }
-
-$ejercicios = $_SESSION['ejercicios_suma'];
 ?>
 
 <!doctype html>
@@ -65,34 +102,46 @@ $ejercicios = $_SESSION['ejercicios_suma'];
 
     <div class="row mb-4">
         <div class="col-md-3 text-center">
-            <a href="juegos.php" class="btn btn-primary me-2">ㅤVolverㅤ</a>
+            <a href="juegos.php" class="btn btn-danger me-2">Salir</a>
         </div>
-        <h2 class="col-md-6 text-center">Ejercicios de Sumas</h2>
+        <h2 class="col-md-6 text-center">Nivel 1</h2>
         <div class="col-md-3 text-center">
-            Barra de progreso
+            <a  class="btn btn-warning me-2">Reiniciar Nivel</a>
         </div>
     </div>
 
     <div class="row">
-        <?php foreach ($ejercicios as $index => $ejercicio): ?>
+        <?php foreach ($ejercicios as $index => $ejercicio):
+            $solucionado = $ejercicio['solucionado'];
+            ?>
             <div class="col-md-3 mb-4">
-                <div class="card exercise-card p-3" id="exerciseCard<?php echo $index; ?>" data-bs-toggle="modal"
-                     data-bs-target="#modalEjercicio<?php echo $index; ?>">
+                <div class="card exercise-card p-3 <?php echo ($solucionado) ? 'disabled' : ''; ?>" id="exerciseCard<?php echo $index; ?>" <?php echo (!$solucionado) ? 'data-bs-toggle="modal" data-bs-target="#modalEjercicio'.$index.'"' : ''; ?>>
                     <div class="sum-container">
-                        <div><?php echo $ejercicio[0]; ?></div>
-                        <div class="plus">+ <?php echo $ejercicio[1]; ?></div>
+                        <div><?php echo $ejercicio['numero1']; ?></div>
+                        <div class="plus">+ <?php echo $ejercicio['numero2']; ?></div>
                         <hr>
                         <div style="display: flex; align-items: center; justify-content: end;">
-                            <div class="plus" id="cuartaPosicionListo<?php echo $index; ?>">ㅤ</div>
-                            <div class="plus" id="terceraPosicionListo<?php echo $index; ?>"></div>
-                            <div class="plus" id="segundaPosicionListo<?php echo $index; ?>"></div>
-                            <div class="plus" id="primeraPosicionListo<?php echo $index; ?>"></div>
+                            <?php if($solucionado):
+                                // Se muestra el resultado formateado a 4 dígitos
+                                $solvedAnswer = str_pad($ejercicio['resultado'], 4, "0", STR_PAD_LEFT);
+                                ?>
+                                <div class="plus" id="cuartaPosicionListo<?php echo $index; ?>"><?php echo $solvedAnswer[0]; ?></div>
+                                <div class="plus" id="terceraPosicionListo<?php echo $index; ?>"><?php echo $solvedAnswer[1]; ?></div>
+                                <div class="plus" id="segundaPosicionListo<?php echo $index; ?>"><?php echo $solvedAnswer[2]; ?></div>
+                                <div class="plus" id="primeraPosicionListo<?php echo $index; ?>"><?php echo $solvedAnswer[3]; ?></div>
+                            <?php else: ?>
+                                <div class="plus" id="cuartaPosicionListo<?php echo $index; ?>">ㅤ</div>
+                                <div class="plus" id="terceraPosicionListo<?php echo $index; ?>"></div>
+                                <div class="plus" id="segundaPosicionListo<?php echo $index; ?>"></div>
+                                <div class="plus" id="primeraPosicionListo<?php echo $index; ?>"></div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal para resolver el ejercicio -->
+            <!-- Modal para resolver el ejercicio (solo si no está resuelto) -->
+            <?php if(!$solucionado): ?>
             <div class="modal fade" id="modalEjercicio<?php echo $index; ?>" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -102,8 +151,8 @@ $ejercicios = $_SESSION['ejercicios_suma'];
                         </div>
                         <div class="modal-body text-center">
                             <div class="sum-container">
-                                <div class="plus-modal"><?php echo $ejercicio[0]; ?></div>
-                                <div class="plus-modal">+ <?php echo $ejercicio[1]; ?></div>
+                                <div class="plus-modal"><?php echo $ejercicio['numero1']; ?></div>
+                                <div class="plus-modal">+ <?php echo $ejercicio['numero2']; ?></div>
                                 <hr>
                                 <div style="display: flex; align-items: center; justify-content: end;">
                                     <div class="plus-modal-result digit" id="cuartaPosicion<?php echo $index; ?>">0</div>
@@ -111,12 +160,13 @@ $ejercicios = $_SESSION['ejercicios_suma'];
                                     <div class="plus-modal-result digit" id="segundaPosicion<?php echo $index; ?>">0</div>
                                     <div class="plus-modal-result digit" id="primeraPosicion<?php echo $index; ?>">0</div>
                                 </div>
-                                <button class="btn btn-primary mt-3" onclick="comprobarRespuesta(<?php echo $ejercicio[0] + $ejercicio[1]; ?>, <?php echo $index; ?>)">Comprobar</button>
+                                <button class="btn btn-primary mt-3" onclick="comprobarRespuesta(<?php echo $ejercicio['numero1'] + $ejercicio['numero2']; ?>, <?php echo $index; ?>, <?php echo $ejercicio['numero1']; ?>, <?php echo $ejercicio['numero2']; ?>)">Comprobar</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        <?php endif; ?>
 
         <?php endforeach; ?>
     </div>
@@ -143,41 +193,34 @@ $ejercicios = $_SESSION['ejercicios_suma'];
 
 <script>
     function mostrarModal() {
-        // Mostrar el modal de Bootstrap
         var modal = new bootstrap.Modal(document.getElementById('modalCerrarSesion'));
         modal.show();
     }
-    // Función para incrementar el valor de cada posición
+
+    // Incrementar el valor de cada dígito (solo para ejercicios no resueltos)
     document.querySelectorAll('.digit').forEach(digit => {
         digit.addEventListener('click', function () {
+            if(this.closest('.exercise-card')?.classList.contains('disabled')) return;
             let valorActual = parseInt(this.textContent);
-            if (valorActual != 0) {
-                this.textContent = 0;
-            }
             this.textContent = (valorActual + 1) % 10;
             const sonido = new Audio('assets/incrementar.mp3');
             sonido.play();
         });
     });
 
-    function comprobarRespuesta(resultadoCorrecto, index) {
-        //transformar repuesta del usuario
+    function comprobarRespuesta(resultadoCorrecto, index, numero1, numero2) {
         let primera = document.getElementById(`primeraPosicion${index}`).textContent;
         let segunda = document.getElementById(`segundaPosicion${index}`).textContent;
         let tercera = document.getElementById(`terceraPosicion${index}`).textContent;
         let cuarta = document.getElementById(`cuartaPosicion${index}`).textContent;
         let respuestaUsuario = parseInt(cuarta + tercera + segunda + primera);
 
-        console.log("Correcto:", resultadoCorrecto);
-        console.log("Usuario:", respuestaUsuario);
-
-        // Seleccionar los divs donde mostrar los resultados
+        // Mostrar en la card el resultado si es correcto
         let primeraPosicion = document.getElementById(`primeraPosicionListo${index}`);
         let segundaPosicion = document.getElementById(`segundaPosicionListo${index}`);
         let terceraPosicion = document.getElementById(`terceraPosicionListo${index}`);
         let cuartaPosicion = document.getElementById(`cuartaPosicionListo${index}`);
 
-        //comparamos
         if (respuestaUsuario === resultadoCorrecto) {
             primeraPosicion.textContent = primera;
             segundaPosicion.textContent = segunda;
@@ -187,16 +230,13 @@ $ejercicios = $_SESSION['ejercicios_suma'];
             let card = document.getElementById(`exerciseCard${index}`);
             card.classList.add('disabled');
 
-            // Enviar los datos al servidor para guardar en la base de datos
-            let numero1 = <?php echo $ejercicio[0]; ?>;
-            let numero2 = <?php echo $ejercicio[1]; ?>;
-            let resultadoUsuario = respuestaUsuario;
-
+            // Enviar los datos al servidor, incluyendo el índice de card
             let formData = new FormData();
             formData.append('numero1', numero1);
             formData.append('numero2', numero2);
             formData.append('resultado_correcto', resultadoCorrecto);
-            formData.append('resultado_usuario', resultadoUsuario);
+            formData.append('resultado_usuario', respuestaUsuario);
+            formData.append('card_index', index);
 
             fetch('php/GuardarEjercicio.php', {
                 method: 'POST',
@@ -217,12 +257,10 @@ $ejercicios = $_SESSION['ejercicios_suma'];
         } else {
             const sonido = new Audio('assets/malo.mp3');
             sonido.play();
-
         }
     }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
