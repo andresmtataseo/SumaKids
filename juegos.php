@@ -80,7 +80,7 @@ if (!isset($_SESSION['usuario'])) {
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
-                                <h5 class="card-title">Ejercicios de multiplicación (No disponible)</h5>
+                                <h5 class="card-title">Ejercicios de multiplicación <b>(No disponible)</b></h5>
                                 <p class="card-text">Practica multiplicaciones simples con números de tres cifras.
                                     Ejercicios diseñados para niños que están aprendiendo a multiplicar.</p>
                                 <p class="card-text"><small class="text-body-secondary">Muy pronto...</small></p>
@@ -99,7 +99,7 @@ if (!isset($_SESSION['usuario'])) {
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
-                                <h5 class="card-title">Ejercicios de Resta (No disponible)</h5>
+                                <h5 class="card-title">Ejercicios de Resta <b>(No disponible)</b></h5>
                                 <p class="card-text">Practica restas simples con números de tres cifras. Ejercicios diseñados para niños que están aprendiendo a restar.</p>
                                 <p class="card-text"><small class="text-body-secondary">Muy pronto...</small></p>
                             </div>
@@ -117,7 +117,7 @@ if (!isset($_SESSION['usuario'])) {
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
-                                <h5 class="card-title">Ejercicios de División (No disponible)</h5>
+                                <h5 class="card-title">Ejercicios de División <b>(No disponible)</b></h5>
                                 <p class="card-text">Practica divisiones simples con números de tres cifras. Ejercicios diseñados para niños que están aprendiendo a dividir.</p>
                                 <p class="card-text"><small class="text-body-secondary">Muy pronto...</small></p>
                             </div>

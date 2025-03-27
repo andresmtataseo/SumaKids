@@ -30,7 +30,7 @@ footer {
 
 .boxHeader .textosHeader {
     position: relative;
-    z-index: 1; /* Asegura que el texto esté sobre el video */
+    z-index: 1;
     text-align: center;
     transform: translateY(0);
     opacity: 1;
@@ -39,8 +39,13 @@ footer {
 }
 
 .boxHeader .textosHeader h1 {
-    font-size: 60px;
+    font-size: 50px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.sumaKids span {
+    display: inline-block;
+    letter-spacing: -12px;
 }
 
 .boxHeader .textosHeader p {
@@ -138,4 +143,45 @@ hr {
 .disabled {
     pointer-events: none; /* Desactiva la interacción con la tarjeta */
     background-color: #6fff90 !important;
+}
+
+
+@media (max-width: 768px) {
+    .boxHeader .textosHeader {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        transform: translateY(0);
+        opacity: 1;
+        animation: animacion2 1s ease-out;
+        width: 80%;
+    }
+
+    .textosHeader h1 {
+        font-size: 1.5rem;
+    }
+
+    .textosHeader p {
+        font-size: 1rem;
+    }
+
+    .imgHeader video {
+        width: 100%;
+        height: auto;
+    }
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 480px) {
+    .textosHeader h1 {
+        font-size: 1.2rem;
+    }
+
+    .textosHeader p {
+        font-size: 0.9rem;
+    }
+
+    .boxHeader {
+        flex-direction: column;
+    }
 }

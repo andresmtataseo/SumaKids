@@ -130,7 +130,7 @@ if ($countSolucionados === 8) {
         <h2 class="col-md-6 text-center">Nivel <?php echo $_SESSION['nivel']; ?></h2>
         <div class="col-md-3 text-center">
             <button class="btn btn-warning me-2" onclick="mostrarModalReiniciar()">Reiniciar Nivel</button>
-        </div>>
+        </div>
     </div>
     <div class="row">
         <?php foreach ($ejercicios as $index => $ejercicio):
