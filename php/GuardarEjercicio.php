@@ -22,6 +22,11 @@ if ($respuesta_usuario == $resultadoCorrecto) {
     $execute = mysqli_query($conexion, $query);
 
     if ($execute) {
+        // Actualizar la sesión para conservar el estado del ejercicio resuelto
+        if(isset($_SESSION['ejercicios_suma'][$card_index])){
+            $_SESSION['ejercicios_suma'][$card_index]['solucionado'] = true;
+            $_SESSION['ejercicios_suma'][$card_index]['resultado'] = $respuesta_usuario;
+        }
         echo 'El ejercicio se guardó correctamente';
     } else {
         echo 'No se guardó correctamente';

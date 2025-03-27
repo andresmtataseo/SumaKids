@@ -84,7 +84,7 @@ if (!isset($_SESSION['ejercicios_suma'])) {
     $ejercicios = $_SESSION['ejercicios_suma'];
 }
 
-// Verificar si todos los ejercicios fueron resueltos para mostrar el modal de felicitaciones
+// Verificar si todos los ejercicios fueron resueltos para mostrar el modal de felicitaciones (esto se hace también al cargar la página)
 $nivelCompleto = false;
 $countSolucionados = 0;
 foreach ($ejercicios as $ej) {
@@ -129,8 +129,8 @@ if ($countSolucionados === 8) {
         </div>
         <h2 class="col-md-6 text-center">Nivel <?php echo $_SESSION['nivel']; ?></h2>
         <div class="col-md-3 text-center">
-            <a class="btn btn-warning me-2" href="reiniciar_nivel.php">Reiniciar Nivel</a>
-        </div>
+            <button class="btn btn-warning me-2" onclick="mostrarModalReiniciar()">Reiniciar Nivel</button>
+        </div>>
     </div>
     <div class="row">
         <?php foreach ($ejercicios as $index => $ejercicio):
@@ -162,7 +162,7 @@ if ($countSolucionados === 8) {
             </div>
             <!-- Modal para resolver el ejercicio (solo si no está resuelto) -->
             <?php if(!$solucionado): ?>
-            <div class="modal fade" id="modalEjercicio<?php echo $index; ?>" tabindex="-1" aria-hidden="true">
+            <div class="modal fade" id="modalEjercicio<?php echo $index; ?>" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -180,7 +180,10 @@ if ($countSolucionados === 8) {
                                     <div class="plus-modal-result digit" id="segundaPosicion<?php echo $index; ?>">0</div>
                                     <div class="plus-modal-result digit" id="primeraPosicion<?php echo $index; ?>">0</div>
                                 </div>
-                                <button class="btn btn-primary mt-3" onclick="comprobarRespuesta(<?php echo $ejercicio['numero1'] + $ejercicio['numero2']; ?>, <?php echo $index; ?>, <?php echo $ejercicio['numero1']; ?>, <?php echo $ejercicio['numero2']; ?>)">Comprobar</button>
+                                <div class="modal-footer">
+                                    <button class="btn btn-danger mt-3" data-bs-dismiss="modal">Regresar</button>
+                                    <button class="btn btn-success mt-3" onclick="comprobarRespuesta(<?php echo $ejercicio['numero1'] + $ejercicio['numero2']; ?>, <?php echo $index; ?>, <?php echo $ejercicio['numero1']; ?>, <?php echo $ejercicio['numero2']; ?>)">Comprobar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -191,7 +194,7 @@ if ($countSolucionados === 8) {
     </div>
 </div>
 <!-- Modal de felicitaciones por completar el nivel -->
-<div class="modal fade" id="modalNivelCompleto" tabindex="-1" aria-labelledby="modalNivelCompletoLabel" aria-hidden="true">
+<div class="modal fade" id="modalNivelCompleto" tabindex="-1" aria-labelledby="modalNivelCompletoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -229,9 +232,32 @@ if ($countSolucionados === 8) {
         </div>
     </div>
 </div>
+
+<!-- Modal de confirmación para reiniciar nivel -->
+<div class="modal fade" id="modalReiniciarNivel" tabindex="-1" aria-labelledby="modalReiniciarNivelLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalReiniciarNivelLabel">Reiniciar Nivel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>¿Estás seguro de que quieres reiniciar el nivel? Perderás tu progreso actual.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="php/ReiniciarNivel.php" class="btn btn-danger">Reiniciar</a>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     function mostrarModal() {
         var modal = new bootstrap.Modal(document.getElementById('modalCerrarSesion'));
+        modal.show();
+    }
+    function mostrarModalReiniciar() {
+        var modal = new bootstrap.Modal(document.getElementById('modalReiniciarNivel'));
         modal.show();
     }
     // Incrementar el valor de cada dígito (solo para ejercicios no resueltos)
@@ -278,11 +304,20 @@ if ($countSolucionados === 8) {
                 .catch(error => console.error('Error al guardar:', error));
             const sonido = new Audio('assets/bueno.mp3');
             sonido.play();
+            // Actualización en la sesión (para el refresco de la página) se realiza en GuardarEjercicio.php
+
             // Cerrar modal de ejercicio
             let modal = document.getElementById(`modalEjercicio${index}`);
             let modalInstance = bootstrap.Modal.getInstance(modal);
             if (modalInstance) {
                 modalInstance.hide();
+            }
+
+            // Verificar dinámicamente si ya se han resuelto todos los ejercicios y mostrar el modal de felicitaciones
+            let solvedCards = document.querySelectorAll('.exercise-card.disabled').length;
+            if (solvedCards === 8) {
+                var modalNivel = new bootstrap.Modal(document.getElementById('modalNivelCompleto'));
+                modalNivel.show();
             }
         } else {
             const sonido = new Audio('assets/malo.mp3');
